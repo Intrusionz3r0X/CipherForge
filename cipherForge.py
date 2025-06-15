@@ -3,18 +3,25 @@
 import argparse
 import os
 import sys
+import pyfiglet
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 
-class Colors:
+class fg:
+    BLACK   = '\033[30m'
     RED     = '\033[31m'
     GREEN   = '\033[32m'
+    YELLOW  = '\033[33m'
+    BLUE    = '\033[34m'
+    MAGENTA = '\033[35m'
+    CYAN    = '\033[36m'
     WHITE   = '\033[37m'
-    END     = '\033[39m'
+    END   = '\033[39m'
 
-def validate_file(path, description):
+
+def validate_file(path):
     if not os.path.isfile(path):
-        print(f"{Colors.RED}[!] {description} not found: {path}{Colors.END}")
+        print(f"{fg.RED}[!] shellcode not found: {path}{fg.END}")
         sys.exit(1)
 
 def pad(data, block_size=16):
@@ -62,8 +69,11 @@ def main():
     parser.add_argument("-m", "--mode", required=True, choices=["rc4", "xor", "aes"], help="Encryption mode")
     parser.add_argument("-c", "--cpp", action="store_true", help="Output C++ format")
     args = parser.parse_args()
+    validate_file(args.shellcode)
 
-    validate_file(args.shellcode, "Shellcode")
+    banner = pyfiglet.figlet_format("CipherForge", font="slant")
+    print(f"{fg.RED}{banner}{fg.END}")
+    print(" "*34+f"{fg.WHITE}Created by Intrusionz3r0{fg.END}\n")
 
     with open(args.shellcode, 'rb') as f:
         data = f.read()
@@ -78,17 +88,17 @@ def main():
 
     if args.cpp:
         cpp_code = to_cpp_array(encrypted)
-        print(f"{Colors.GREEN}[+] C++ formatted shellcode:\n{Colors.END}")
+        print(f"{fg.GREEN}[+] C++ formatted shellcode:\n{fg.END}")
         print(cpp_code)
         if args.output:
             with open(args.output, "w") as f:
                 f.write(cpp_code)
-            print(f"{Colors.GREEN}[+] Written to: {args.output}{Colors.END}")
+            print(f"{fg.GREEN}[+] Written to: {args.output}{fg.END}")
     else:
         out_file = args.output if args.output else f"{args.shellcode}.{args.mode}.enc"
         with open(out_file, "wb") as f:
             f.write(encrypted)
-        print(f"{Colors.GREEN}[+] Encrypted shellcode written to: {out_file}{Colors.END}")
+        print(f"{fg.GREEN}[+] Encrypted shellcode written to: {out_file}{fg.END}")
 
 if __name__ == "__main__":
     main()
