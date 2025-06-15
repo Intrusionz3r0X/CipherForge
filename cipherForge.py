@@ -62,12 +62,13 @@ def to_cpp_array(data, var_name="shellcode"):
     return f"unsigned char {var_name}[] = {{ {formatted} }};\nunsigned int {var_name}_len = {len(data)};"
 
 def main():
-    parser = argparse.ArgumentParser(description="Encrypt shellcode and output C++-compatible format")
+    parser = argparse.ArgumentParser(description="Encrypt shellcode (RC4/XOR/AES) and output C++-compatible format.\nExample: %(prog)s -s shellcode.bin -k 'pass123' -m xor -c")
     parser.add_argument("-s", "--shellcode", required=True, help="Shellcode file path")
     parser.add_argument("-k", "--key", required=True, help="Encryption key")
     parser.add_argument("-o", "--output", help="Output file (optional)")
     parser.add_argument("-m", "--mode", required=True, choices=["rc4", "xor", "aes"], help="Encryption mode")
     parser.add_argument("-c", "--cpp", action="store_true", help="Output C++ format")
+    parser.add_argument("-v", "--version", action="version", version="CipherForge 1.0")
     args = parser.parse_args()
     validate_file(args.shellcode)
 
